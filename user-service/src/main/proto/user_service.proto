@@ -1,0 +1,103 @@
+syntax = "proto3";
+
+option java_multiple_files = true;
+option java_package = "com.example.movie.userservice.proto";
+option java_outer_classname = "UserProto";
+
+package user;
+
+// User service definition
+service UserService {
+  // Unary RPC - Get user profile
+  rpc GetUserProfile(UserRequest) returns (UserProfileResponse) {}
+
+  // Server streaming RPC - Get user activity history
+  rpc GetUserActivityHistory(UserHistoryRequest) returns (stream UserActivityResponse) {}
+
+  // Client streaming RPC - Update user preferences
+  rpc UpdateUserPreferences(stream UserPreferenceRequest) returns (UpdatePreferencesResponse) {}
+
+  // Bidirectional streaming RPC - Real-time user activity tracking
+  rpc TrackUserActivity(stream UserActivityEvent) returns (stream UserInsightResponse) {}
+}
+
+// User request by ID
+message UserRequest {
+  int32 user_id = 1;
+}
+
+// User profile response
+message UserProfileResponse {
+  int32 user_id = 1;
+  string username = 2;
+  string email = 3;
+  repeated string favorite_genres = 4;
+  int32 account_age_days = 5;
+  int32 activity_level = 6; // 1-10 scale
+}
+
+// Request for user history
+message UserHistoryRequest {
+  int32 user_id = 1;
+  int32 limit = 2;
+  int64 since_timestamp = 3; // Optional filter since timestamp
+}
+
+// User activity response
+message UserActivityResponse {
+  int32 activity_id = 1;
+  int32 user_id = 2;
+  int32 movie_id = 3;
+  string movie_title = 4;
+  ActivityType activity_type = 5;
+  int64 timestamp = 6;
+
+  enum ActivityType {
+    VIEW = 0;
+    RATE = 1;
+    BOOKMARK = 2;
+    WATCH = 3;
+    SHARE = 4;
+  }
+}
+
+// User preference update request
+message UserPreferenceRequest {
+  int32 user_id = 1;
+  string preference_key = 2; // e.g., "genre", "actor", "director"
+  string preference_value = 3;
+  float weight = 4; // Preference weight (0.0-1.0)
+}
+
+// Response for preference updates
+message UpdatePreferencesResponse {
+  int32 updated_count = 1;
+  bool success = 2;
+  repeated string updated_preferences = 3;
+}
+
+// Real-time user activity event
+message UserActivityEvent {
+  int32 user_id = 1;
+  EventType event_type = 2;
+  string event_data = 3; // JSON payload with event details
+  int64 timestamp = 4;
+
+  enum EventType {
+    PAGE_VIEW = 0;
+    SEARCH = 1;
+    CLICK = 2;
+    PLAY = 3;
+    PAUSE = 4;
+    FINISH = 5;
+    RATE = 6;
+  }
+}
+
+// User insight response for real-time tracking
+message UserInsightResponse {
+  int32 user_id = 1;
+  string insight_type = 2; // e.g., "mood", "engagement", "preference_shift"
+  string insight_data = 3; // JSON payload with insight details
+  float confidence_score = 4;
+}

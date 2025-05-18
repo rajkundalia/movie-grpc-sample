@@ -1,0 +1,79 @@
+syntax = "proto3";
+
+option java_multiple_files = true;
+option java_package = "com.example.movie.movieservice.proto";
+option java_outer_classname = "MovieProto";
+
+package movie;
+
+// Movie service definition
+service MovieService {
+  // Unary RPC - Get movie by ID
+  rpc GetMovie(MovieRequest) returns (MovieResponse) {}
+
+  // Server streaming RPC - Get trending movies
+  rpc GetTrendingMovies(TrendingMoviesRequest) returns (stream MovieResponse) {}
+
+  // Client streaming RPC - Batch update movie ratings
+  rpc UpdateMovieRatings(stream UpdateRatingRequest) returns (UpdateRatingBatchResponse) {}
+
+  // Bidirectional streaming RPC - Get personalized recommendations
+  rpc GetPersonalizedRecommendations(stream UserEventRequest) returns (stream MovieRecommendation) {}
+}
+
+// Movie request by ID
+message MovieRequest {
+  int32 movie_id = 1;
+}
+
+// Movie response with details
+message MovieResponse {
+  int32 movie_id = 1;
+  string title = 2;
+  string description = 3;
+  float rating = 4;
+  string genre = 5;
+  int32 year = 6;
+  string director = 7;
+}
+
+// Request for trending movies
+message TrendingMoviesRequest {
+  int32 limit = 1;
+  string genre = 2; // Optional genre filter
+}
+
+// Request to update movie rating
+message UpdateRatingRequest {
+  int32 movie_id = 1;
+  int32 user_id = 2;
+  float rating = 3;
+}
+
+// Response for batch rating update
+message UpdateRatingBatchResponse {
+  int32 updated_count = 1;
+  bool success = 2;
+}
+
+// User event request for personalized recommendations
+message UserEventRequest {
+  int32 user_id = 1;
+  int32 movie_id = 2;
+  EventType event_type = 3;
+
+  enum EventType {
+    VIEW = 0;
+    RATE = 1;
+    BOOKMARK = 2;
+    WATCH = 3;
+  }
+}
+
+// Movie recommendation with confidence score
+message MovieRecommendation {
+  int32 movie_id = 1;
+  string title = 2;
+  float confidence_score = 3;
+  string recommendation_reason = 4;
+}
