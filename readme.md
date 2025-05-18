@@ -10,3 +10,17 @@ Note: Ideally, the proto files should be kept at a common location.
 # Also calling of movie-service from user-service was not thought through.
 
 # However, the configurations are correct, it can help anyone setup gRPC with Spring Boot.
+
+# Commands:
+
+1. mvn clean install
+2. Start Eureka Server [because code has client discovery, no use otherwise]
+3. Start movie-service
+4. Start user-service
+5. Install grpcurl https://github.com/fullstorydev/grpcurl?tab=readme-ov-file [one time]
+6. Try: [I was trying in Windows Powershell]
+   1. grpcurl -plaintext -proto ./src/main/proto/movie_service.proto -import-path ./src/main/proto -d '{\"movie_id\":1}' localhost:9090 movie.MovieService.GetMovie
+   2. grpcurl -plaintext -proto ./src/main/proto/movie_service.proto -import-path ./src/main/proto -d '{\"limit\":5, \"genre\":\"Drama\"}' localhost:9090 movie.MovieService.GetTrendingMovies
+   3. grpcurl -plaintext -proto ./src/main/proto/user_service.proto -import-path ./src/main/proto -d '{\"user_id\":1}' localhost:9092 user.UserService.GetUserProfile
+   
+You can generate grpcurl commands using an LLM tool.
